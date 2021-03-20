@@ -1,4 +1,4 @@
-package pl.sda.domain;
+package pl.sda.external.entity;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -11,10 +11,12 @@ public class ExchangeRate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String currency;
+    private Double rate;
     private LocalDate rateDate;
 
-    public ExchangeRate(String currency, LocalDate rateDate) {
+    public ExchangeRate(String currency, Double rate, LocalDate rateDate) {
         this.currency = currency;
+        this.rate = rate;
         this.rateDate = rateDate;
     }
 
@@ -27,6 +29,10 @@ public class ExchangeRate {
 
     public String getCurrency() {
         return currency;
+    }
+
+    public Double getRate() {
+        return rate;
     }
 
     public LocalDate getRateDate() {
