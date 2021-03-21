@@ -1,17 +1,17 @@
 package pl.sda.external.dao;
 
+import org.hibernate.SessionFactory;
 import pl.sda.external.entity.ExchangeRate;
 
-import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.util.Optional;
 
 public class ExchangeRateDao {
 
-    private final EntityManager entityManager;
+    private final SessionFactory sessionFactory;
 
-    public ExchangeRateDao(EntityManager entityManager) {
-        this.entityManager = entityManager;
+    public ExchangeRateDao(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
     public Optional<ExchangeRate> findByCurrencyAndDate(String currency, LocalDate localDate) {

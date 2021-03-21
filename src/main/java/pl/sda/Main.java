@@ -1,28 +1,42 @@
 package pl.sda;
 
 import com.squareup.okhttp.OkHttpClient;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.service.ServiceRegistry;
 import pl.sda.external.client.NbpApiClient;
 import pl.sda.external.dao.ExchangeRateDao;
+import pl.sda.external.entity.ExchangeRate;
 import pl.sda.service.ExchangeRateService;
 import pl.sda.view.Menu;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import java.time.LocalDate;
 
 public class Main {
 
     public static void main(String[] args) {
-        EntityManagerFactory entityManagerFactory =
-                Persistence.createEntityManagerFactory("ExchangeRates");
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        SessionFactory sessionFactory = buildSessionFactory();
+
         OkHttpClient okHttpClient = new OkHttpClient();
-        ExchangeRateDao dao = new ExchangeRateDao(entityManager);
+
+        ExchangeRateDao dao = new ExchangeRateDao(sessionFactory);
         NbpApiClient nbpApiClient = new NbpApiClient(okHttpClient);
         ExchangeRateService exchangeRateService = new ExchangeRateService(dao, nbpApiClient);
 
         Menu menu = new Menu(exchangeRateService);
 
         menu.displayMenu();
+    }
+
+    private static SessionFactory buildSessionFactory() {
+        ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
+                .configure("hibernate.cfg.xml").build();
+
+        Metadata metadata = new MetadataSources(serviceRegistry).getMetadataBuilder().build();
+
+        return metadata.getSessionFactoryBuilder().build();
     }
 }
