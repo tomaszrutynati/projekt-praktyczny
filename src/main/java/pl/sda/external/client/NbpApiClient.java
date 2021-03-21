@@ -1,6 +1,7 @@
 package pl.sda.external.client;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -24,12 +25,19 @@ public class NbpApiClient {
             Response response = okHttpClient.newCall(rq).execute();
             if (response.isSuccessful()) {
                 String json = response.body().string();
-                return new Gson().fromJson(json, NbpTable.class);
+                Gson gson = getGson();
+                return gson.fromJson(json, NbpTable.class);
             }
             return null;
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private Gson getGson() {
+        return new GsonBuilder()
+                .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+                .create();
     }
 }
