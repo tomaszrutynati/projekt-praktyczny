@@ -2,6 +2,8 @@ package pl.sda.external.client;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -15,6 +17,28 @@ public class NbpApiClient {
     public NbpApiClient(OkHttpClient okHttpClient) {
         this.okHttpClient = okHttpClient;
     }
+
+    public String getTableANumberForDay(LocalDate date) {
+        Request rq = new Request.Builder()
+                .url("http://api.nbp.pl/api/exchangerates/tables/A/"
+                        + date.toString() + "?format=json")
+                .build();
+        try {
+            Response response = okHttpClient.newCall(rq).execute();
+            if (response.isSuccessful()) {
+                String json = response.body().string();
+                Gson gson = getGson();
+                JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
+                JsonPrimitive number = jsonObject.getAsJsonPrimitive("no");
+                return number.getAsString();
+            }
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
     public NbpTable getTableAForDay(LocalDate date) {
         Request rq = new Request.Builder()
